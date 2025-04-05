@@ -1,15 +1,15 @@
 {
   "files": {
-    "main.css": "/Sudhanshu-S3/JobSrcapper-client/static/css/main.70eab0c4.css",
-    "main.js": "/Sudhanshu-S3/JobSrcapper-client/static/js/main.c8104e81.js",
-    "static/js/453.419a5d54.chunk.js": "/Sudhanshu-S3/JobSrcapper-client/static/js/453.419a5d54.chunk.js",
-    "index.html": "/Sudhanshu-S3/JobSrcapper-client/index.html",
-    "main.70eab0c4.css.map": "/Sudhanshu-S3/JobSrcapper-client/static/css/main.70eab0c4.css.map",
-    "main.c8104e81.js.map": "/Sudhanshu-S3/JobSrcapper-client/static/js/main.c8104e81.js.map",
-    "453.419a5d54.chunk.js.map": "/Sudhanshu-S3/JobSrcapper-client/static/js/453.419a5d54.chunk.js.map"
+    "main.css": "/JobSrcapper-client/static/css/main.70eab0c4.css",
+    "main.js": "/JobSrcapper-client/static/js/main.dfeb299f.js",
+    "static/js/453.419a5d54.chunk.js": "/JobSrcapper-client/static/js/453.419a5d54.chunk.js",
+    "index.html": "/JobSrcapper-client/index.html",
+    "main.70eab0c4.css.map": "/JobSrcapper-client/static/css/main.70eab0c4.css.map",
+    "main.dfeb299f.js.map": "/JobSrcapper-client/static/js/main.dfeb299f.js.map",
+    "453.419a5d54.chunk.js.map": "/JobSrcapper-client/static/js/453.419a5d54.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.70eab0c4.css",
-    "static/js/main.c8104e81.js"
+    "static/js/main.dfeb299f.js"
   ]
 }
