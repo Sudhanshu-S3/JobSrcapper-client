@@ -1,15 +1,15 @@
 {
   "files": {
-    "main.css": "/JobSrcapper-client/static/css/main.70eab0c4.css",
-    "main.js": "/JobSrcapper-client/static/js/main.dfeb299f.js",
-    "static/js/453.419a5d54.chunk.js": "/JobSrcapper-client/static/js/453.419a5d54.chunk.js",
-    "index.html": "/JobSrcapper-client/index.html",
-    "main.70eab0c4.css.map": "/JobSrcapper-client/static/css/main.70eab0c4.css.map",
-    "main.dfeb299f.js.map": "/JobSrcapper-client/static/js/main.dfeb299f.js.map",
-    "453.419a5d54.chunk.js.map": "/JobSrcapper-client/static/js/453.419a5d54.chunk.js.map"
+    "main.css": "https://sudhanshu-s3.github.io/JobSrcapper-client/static/css/main.7ef3991d.css",
+    "main.js": "https://sudhanshu-s3.github.io/JobSrcapper-client/static/js/main.89e26646.js",
+    "static/js/453.419a5d54.chunk.js": "https://sudhanshu-s3.github.io/JobSrcapper-client/static/js/453.419a5d54.chunk.js",
+    "index.html": "https://sudhanshu-s3.github.io/JobSrcapper-client/index.html",
+    "main.7ef3991d.css.map": "https://sudhanshu-s3.github.io/JobSrcapper-client/static/css/main.7ef3991d.css.map",
+    "main.89e26646.js.map": "https://sudhanshu-s3.github.io/JobSrcapper-client/static/js/main.89e26646.js.map",
+    "453.419a5d54.chunk.js.map": "https://sudhanshu-s3.github.io/JobSrcapper-client/static/js/453.419a5d54.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.70eab0c4.css",
-    "static/js/main.dfeb299f.js"
+    "static/css/main.7ef3991d.css",
+    "static/js/main.89e26646.js"
   ]
 }
