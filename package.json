@@ -15,9 +15,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject",
+    "build": "PUBLIC_URL=https://sudhanshu-s3.github.io/JobSrcapper-client react-scripts build",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d build"
   },

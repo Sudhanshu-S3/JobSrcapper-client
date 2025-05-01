@@ -1,11 +1,13 @@
 const dev = {
-    API_URL: "http://localhost:5050/api" // Updated port from 5000 to 5050 to match server config
+    API_URL: "http://localhost:5050/api"
 };
 
 const prod = {
-    API_URL: "https://jobsrcapper-server.onrender.com/api" // Fixed: added /api path and removed trailing slash
+    API_URL: "https://jobsrcapper-server.onrender.com/api"
 };
 
-const config = process.env.NODE_ENV === "production" ? prod : dev;
+// Force production config when on GitHub Pages domain
+const isGitHubPages = window.location.hostname.includes('github.io');
+const config = (process.env.NODE_ENV === "production" || isGitHubPages) ? prod : dev;
 
 export default config;
