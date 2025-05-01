@@ -10,18 +10,14 @@ function App() {
   const [jobType, setJobType] = useState('all');
   const [darkMode, setDarkMode] = useState(false);
 
-  // State for sources (checkboxes)
-  const [sources, setSources] = useState({
-    linkedin: true,
-    wellfound: true,
-    unstop: true
-  });
-
   // State for results and loading
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [availableSources, setAvailableSources] = useState([]);
+
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [jobsPerPage, setJobsPerPage] = useState(10);
 
   // Effect to handle theme changes
   useEffect(() => {
@@ -46,28 +42,15 @@ function App() {
     localStorage.setItem('darkMode', darkMode);
   }, [darkMode]);
 
+  // Reset pagination when jobs change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [jobs]);
+
   // Toggle dark mode
   const toggleDarkMode = () => {
     setDarkMode(!darkMode);
   };
-
-  // Fetch available sources when component mounts
-  useEffect(() => {
-    axios.get(`${config.API_URL}/jobs/sources`)
-      .then(response => {
-        if (response.data.success) {
-          const sourcesObj = {};
-          response.data.data.forEach(source => {
-            sourcesObj[source] = true;
-          });
-          setSources(sourcesObj);
-          setAvailableSources(response.data.data);
-        }
-      })
-      .catch(err => {
-        console.error('Error fetching sources:', err);
-      });
-  }, []);
 
   // Handle form submission
   const handleSubmit = async (e) => {
@@ -78,24 +61,17 @@ function App() {
       return;
     }
 
-    // Get selected sources
-    const selectedSources = Object.keys(sources).filter(key => sources[key]);
-
-    if (selectedSources.length === 0) {
-      setError('Please select at least one source');
-      return;
-    }
-
     setLoading(true);
     setError(null);
     setJobs([]);
+    setCurrentPage(1); // Reset to first page on new search
 
     try {
       const response = await axios.post(`${config.API_URL}/jobs/scrape`, {
         searchQuery,
         location: location.trim() || undefined,
         jobType: jobType === 'all' ? undefined : jobType,
-        sources: selectedSources
+        sources: ['linkedin'] // Only use LinkedIn
       });
 
       if (response.data.success) {
@@ -111,19 +87,35 @@ function App() {
     }
   };
 
-  // Handle source checkbox changes
-  const handleSourceChange = (source) => {
-    setSources(prevSources => ({
-      ...prevSources,
-      [source]: !prevSources[source]
-    }));
+  // Get current page items
+  const indexOfLastJob = currentPage * jobsPerPage;
+  const indexOfFirstJob = indexOfLastJob - jobsPerPage;
+  const currentJobs = jobs.slice(indexOfFirstJob, indexOfLastJob);
+  const totalPages = Math.ceil(jobs.length / jobsPerPage);
+
+  // Change page
+  const paginate = (pageNumber) => {
+    if (pageNumber > 0 && pageNumber <= totalPages) {
+      setCurrentPage(pageNumber);
+      // Scroll back to top of results
+      const resultsSection = document.querySelector('.results-section');
+      if (resultsSection) {
+        resultsSection.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+  };
+
+  // Handle change in jobs per page
+  const handleJobsPerPageChange = (e) => {
+    setJobsPerPage(Number(e.target.value));
+    setCurrentPage(1); // Reset to first page when changing items per page
   };
 
   // Export results to CSV
   const exportToCsv = () => {
     if (!jobs.length) return;
 
-    const headers = ['Title', 'Company', 'Location', 'Posted', 'Source', 'Link'];
+    const headers = ['Title', 'Company', 'Location', 'Posted', 'Link'];
     let csvContent = headers.join(',') + '\n';
 
     jobs.forEach(job => {
@@ -132,7 +124,6 @@ function App() {
         formatForCsv(job.company),
         formatForCsv(job.location),
         formatForCsv(job.posted),
-        formatForCsv(job.source),
         formatForCsv(job.link || '')
       ];
       csvContent += row.join(',') + '\n';
@@ -142,7 +133,7 @@ function App() {
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.setAttribute('download', `jobs_${new Date().toISOString().slice(0, 10)}.csv`);
+    link.setAttribute('download', `linkedin_jobs_${new Date().toISOString().slice(0, 10)}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -153,6 +144,116 @@ function App() {
     if (!text) return '';
     const escaped = String(text).replace(/"/g, '""');
     return /[",\n]/.test(escaped) ? `"${escaped}"` : escaped;
+  };
+
+  // Render pagination controls
+  const renderPagination = () => {
+    if (jobs.length === 0) return null;
+
+    return (
+      <div className="pagination-container">
+        <div className="pagination-controls">
+          <button
+            onClick={() => paginate(currentPage - 1)}
+            className="pagination-button"
+            disabled={currentPage === 1}
+          >
+            Previous
+          </button>
+
+          <div className="pagination-pages">
+            {renderPageNumbers()}
+          </div>
+
+          <button
+            onClick={() => paginate(currentPage + 1)}
+            className="pagination-button"
+            disabled={currentPage === totalPages}
+          >
+            Next
+          </button>
+        </div>
+
+        <div className="pagination-info">
+          <span>
+            Page {currentPage} of {totalPages || 1}
+          </span>
+
+          <div className="jobs-per-page">
+            <label htmlFor="jobsPerPage">Show:</label>
+            <select
+              id="jobsPerPage"
+              value={jobsPerPage}
+              onChange={handleJobsPerPageChange}
+            >
+              <option value={5}>5</option>
+              <option value={10}>10</option>
+              <option value={25}>25</option>
+              <option value={50}>50</option>
+            </select>
+            <span>per page</span>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // Render page number buttons
+  const renderPageNumbers = () => {
+    const pageNumbers = [];
+
+    // Show max 5 page numbers
+    const maxPages = 5;
+    let startPage = Math.max(1, currentPage - Math.floor(maxPages / 2));
+    let endPage = Math.min(totalPages, startPage + maxPages - 1);
+
+    // Adjust if we're near the end
+    if (endPage - startPage + 1 < maxPages) {
+      startPage = Math.max(1, endPage - maxPages + 1);
+    }
+
+    // First page button
+    if (startPage > 1) {
+      pageNumbers.push(
+        <button key="1" onClick={() => paginate(1)} className="pagination-page-button">
+          1
+        </button>
+      );
+      if (startPage > 2) {
+        pageNumbers.push(<span key="ellipsis1" className="pagination-ellipsis">...</span>);
+      }
+    }
+
+    // Page numbers
+    for (let i = startPage; i <= endPage; i++) {
+      pageNumbers.push(
+        <button
+          key={i}
+          onClick={() => paginate(i)}
+          className={`pagination-page-button ${currentPage === i ? 'active' : ''}`}
+        >
+          {i}
+        </button>
+      );
+    }
+
+    // Last page button
+    if (endPage < totalPages) {
+      if (endPage < totalPages - 1) {
+        pageNumbers.push(<span key="ellipsis2" className="pagination-ellipsis">...</span>);
+      }
+      pageNumbers.push(
+        <button
+          key={totalPages}
+          onClick={() => paginate(totalPages)}
+          className="pagination-page-button"
+        >
+          {totalPages}
+        </button>
+      );
+    }
+
+    return pageNumbers;
   };
 
   return (
@@ -167,8 +268,8 @@ function App() {
             {darkMode ? '☀️' : '🌙'}
           </button>
         </div>
-        <h1>Job Aggregator</h1>
-        <p>Search for jobs across LinkedIn, Wellfound, and Unstop</p>
+        <h1>LinkedIn Job Aggregator</h1>
+        <p>Search for jobs on LinkedIn</p>
       </header>
 
       <main className="app-main">
@@ -216,23 +317,6 @@ function App() {
                 </div>
               </div>
 
-              <div className="form-group">
-                <label>Sources</label>
-                <div className="sources-grid">
-                  {availableSources.map(source => (
-                    <div className="source-checkbox" key={source}>
-                      <input
-                        type="checkbox"
-                        id={`source-${source}`}
-                        checked={sources[source] || false}
-                        onChange={() => handleSourceChange(source)}
-                      />
-                      <label htmlFor={`source-${source}`}>{source.charAt(0).toUpperCase() + source.slice(1)}</label>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
               {error && (
                 <div className="error-message">
                   {error}
@@ -244,7 +328,7 @@ function App() {
                 className="search-button"
                 disabled={loading}
               >
-                {loading ? 'Searching...' : 'Search Jobs'}
+                {loading ? 'Searching...' : 'Search LinkedIn Jobs'}
               </button>
             </form>
           </div>
@@ -253,18 +337,21 @@ function App() {
         {loading && (
           <div className="loading-container">
             <div className="spinner"></div>
-            <p>Searching for jobs across multiple platforms...<br />This may take a minute</p>
+            <p>Searching for jobs on LinkedIn...<br />This may take a minute</p>
           </div>
         )}
 
         {!loading && jobs.length > 0 && (
           <section className="results-section">
             <div className="results-header">
-              <h2>Found {jobs.length} Jobs</h2>
+              <h2>Found {jobs.length} Jobs <small style={{ fontWeight: 'normal', fontSize: '0.8em' }}>(sorted by date)</small></h2>
               <button onClick={exportToCsv} className="export-button">
                 Export CSV
               </button>
             </div>
+
+            {/* Pagination Controls - Top */}
+            {renderPagination()}
 
             <div className="table-container">
               <table className="jobs-table">
@@ -274,22 +361,16 @@ function App() {
                     <th>Company</th>
                     <th>Location</th>
                     <th>Posted</th>
-                    <th>Source</th>
                     <th>Action</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {jobs.map((job, index) => (
+                  {currentJobs.map((job, index) => (
                     <tr key={index}>
                       <td className="job-title">{job.title}</td>
                       <td>{job.company}</td>
                       <td>{job.location}</td>
                       <td>{job.posted}</td>
-                      <td>
-                        <span className={`source-badge source-${job.source.toLowerCase()}`}>
-                          {job.source}
-                        </span>
-                      </td>
                       <td>
                         {job.link ? (
                           <a
@@ -309,13 +390,16 @@ function App() {
                 </tbody>
               </table>
             </div>
+
+            {/* Pagination Controls - Bottom */}
+            {renderPagination()}
           </section>
         )}
 
         {!loading && jobs.length === 0 && searchQuery && (
           <div className="no-results">
             <h3>No jobs found</h3>
-            <p>Try adjusting your search criteria or selecting different sources.</p>
+            <p>Try adjusting your search criteria.</p>
           </div>
         )}
 
@@ -323,7 +407,7 @@ function App() {
           <div className="card">
             <h3>About This Tool</h3>
             <ul>
-              <li>This aggregator searches across LinkedIn, Wellfound, and Unstop for job listings</li>
+              <li>This tool searches LinkedIn for job listings</li>
               <li>Results are cached for 30 minutes to improve performance</li>
               <li>For best results, use specific keywords in your search</li>
               <li>Location filters are optional but help narrow down results</li>
@@ -334,7 +418,7 @@ function App() {
       </main>
 
       <footer className="app-footer">
-        <p>Job Aggregator &copy; {new Date().getFullYear()} • Not affiliated with LinkedIn, Wellfound, or Unstop.</p>
+        <p>LinkedIn Job Aggregator &copy; {new Date().getFullYear()} • Not affiliated with LinkedIn.</p>
       </footer>
     </div>
   );

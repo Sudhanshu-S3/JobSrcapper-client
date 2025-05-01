@@ -1,13 +1,13 @@
-# JobScrapper - Job Search Aggregator
+# LinkedIn Job Search Aggregator
 
-A React-based job search aggregator that pulls listings from multiple job sites and presents them in one unified interface.
+A React-based job search aggregator that pulls listings from LinkedIn and presents them in a clean interface.
 
 ## Features
 
-- Search for jobs across multiple platforms simultaneously
+- Search for jobs on LinkedIn
 - Filter results by job type, location, and more
 - Clean, responsive user interface
-- Real-time job data from various job boards
+- Real-time job data from LinkedIn
 
 ## Tech Stack
 
@@ -46,7 +46,7 @@ The application will open in your default browser at [http://localhost:3000](htt
 
 ### Backend Connection
 
-This frontend connects to the JobScrapper backend API. By default, it's configured to use `http://localhost:5000` in development.
+This frontend connects to the LinkedIn job scraper backend API. By default, it's configured to use `http://localhost:5000` in development.
 
 ## Deployment
 
