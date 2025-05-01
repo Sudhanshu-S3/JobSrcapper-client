@@ -3,7 +3,7 @@ const dev = {
 };
 
 const prod = {
-    API_URL: "https://job-aggregator-backend.onrender.com/api" // Updated to standard Render URL pattern
+    API_URL: "https://jobsrcapper-server.onrender.com/api" // Fixed: added /api path and removed trailing slash
 };
 
 const config = process.env.NODE_ENV === "production" ? prod : dev;
