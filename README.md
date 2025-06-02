@@ -46,7 +46,7 @@ The application will open in your default browser at [http://localhost:3000](htt
 
 ### Backend Connection
 
-This frontend connects to the LinkedIn job scraper backend API. By default, it's configured to use `http://localhost:5000` in development.
+This frontend connects to the LinkedIn job scraper backend API. By default, it's configured to use `http://localhost:5050` in development (via proxy in `package.json` and direct URL in `src/config.js`).
 
 ## Deployment
 
@@ -64,7 +64,7 @@ For production deployment, you'll need to create a `src/config.js` file to speci
 
 ```javascript
 const dev = {
-  API_URL: "http://localhost:5000/api",
+  API_URL: "http://localhost:5050/api", // Ensure this matches your local server
 };
 
 const prod = {

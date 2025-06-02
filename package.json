@@ -15,7 +15,8 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "PUBLIC_URL=https://sudhanshu-s3.github.io/JobSrcapper-client react-scripts build",
+    "build": "set PUBLIC_URL=https://sudhanshu-s3.github.io/JobSrcapper-client&& react-scripts build",
+    "postbuild": "copy .\\public\\manifest.json .\\build\\manifest.json",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d build"
   },
